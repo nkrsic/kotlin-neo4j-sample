@@ -3,6 +3,8 @@ package org.example
 import org.neo4j.driver.AuthTokens
 import org.neo4j.driver.Driver
 import org.neo4j.driver.GraphDatabase
+import org.neo4j.driver.Record
+import org.neo4j.driver.Result
 import org.neo4j.driver.Transaction
 import org.neo4j.driver.Values.parameters
 
@@ -18,6 +20,24 @@ fun addPerson(name: String, driver: Driver): Unit{
                 "MERGE (a:Person {name: \$x})",
                 parameters("x", name)
             )
+        }
+    }
+}
+
+fun printPeople(initial: String, driver: Driver){
+    driver.session().use { session ->
+        // A Managed transaction is a quick and easy way to wrap a Cypher Query.
+        // The `session.run` method will run the specified Query.
+        // This simpler method does not use any automatic retry mechanism.
+        val result: Result = session.run(
+            "MATCH (a:Person) WHERE a.name STARTS WITH \$x RETURN a.name AS name",
+            parameters("x", initial)
+        )
+        // Each Cypher execution returns a stream of records.
+        while (result.hasNext()) {
+            val record: Record = result.next()
+            // Values can be extracted from a record by index or name.
+            System.out.println(record.get("name").asString())
         }
     }
 }
@@ -38,6 +58,8 @@ fun main() {
     addPerson("Billy Bob Thornton", driver)
     addPerson("Ada Lovelace", driver)
     addPerson("Alan Turing", driver)
+
+    printPeople("A", driver)
 
     driver.close()
 }
