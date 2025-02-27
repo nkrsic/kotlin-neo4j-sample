@@ -12,6 +12,12 @@ A very simple example of using the Neo4j Java driver from Kotlin.
 - NEO4J_USER
 - NEO4J_PASSWORD 
 
+## Running the program
+
+```
+mvn exec:java -Dexec.mainClass="org.example.MainKt"
+```
+
 ## Sources / Credit
 
 - https://neo4j.com/docs/api/java-driver/current/
